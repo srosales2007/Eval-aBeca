@@ -9,6 +9,7 @@ RepositorioSolicitudes (inyección de dependencias).
 from __future__ import annotations
 
 from app.dominio import Estudiante, Solicitud
+from app.funcional.estadisticas import calcular_estadisticas, filtrar_historial
 from app.integracion.motor import MotorReglas
 from app.repositorio.base import RepositorioSolicitudes
 from app.validacion.esquemas import SolicitudEntrada
@@ -44,5 +45,12 @@ class GestorSolicitudes:
             raise SolicitudNoEncontrada(id_solicitud)
         return solicitud
 
-    def historial(self) -> list[Solicitud]:
-        return self._repositorio.listar()
+    def historial(self, resultado: str | None = None, tipo: str | None = None,
+                  texto: str | None = None) -> list[Solicitud]:
+        return filtrar_historial(self._repositorio.listar(), resultado, tipo, texto)
+
+    def estadisticas(self) -> dict:
+        return calcular_estadisticas(self._repositorio.listar())
+
+    def criterios(self) -> dict:
+        return self._motor.criterios_vigentes()

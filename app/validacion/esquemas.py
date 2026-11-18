@@ -70,6 +70,23 @@ class DictamenSalida(BaseModel):
     condiciones_aplicadas: list[str]
 
 
+class EstadisticasSalida(BaseModel):
+    total: int
+    aprobadas: int
+    rechazadas: int
+    tasa_aprobacion: float
+    promedio_general: float
+    por_tipo: dict[str, int]
+    criterios_incumplidos: dict[str, int]
+    por_carrera: dict[str, int]
+
+
+class CriteriosSalida(BaseModel):
+    periodo: str
+    umbrales: dict[str, float]
+    condiciones_especiales: list[str]
+
+
 class SolicitudSalida(BaseModel):
     id: str
     carne: str

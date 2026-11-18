@@ -14,7 +14,7 @@ from pathlib import Path
 from pyswip import Prolog
 
 from app.dominio import Dictamen, ResultadoDictamen, Solicitud, TipoBeca
-from app.funcional import atomos, filas_a_criterios
+from app.funcional import a_texto, atomos, filas_a_criterios
 
 RUTA_REGLAS = Path(__file__).resolve().parents[2] / "prolog" / "reglas.pl"
 
@@ -24,6 +24,9 @@ class MotorReglas(ABC):
 
     @abstractmethod
     def evaluar(self, solicitud: Solicitud) -> Dictamen: ...
+
+    @abstractmethod
+    def criterios_vigentes(self) -> dict: ...
 
 
 class MotorProlog(MotorReglas):
@@ -72,3 +75,15 @@ class MotorProlog(MotorReglas):
             condiciones_aplicadas=atomos(condiciones, "Co"),
             periodo=atomos(periodo, "P")[0],
         )
+
+    def criterios_vigentes(self) -> dict:
+        """Lee del archivo criterios.pl los umbrales y condiciones vigentes."""
+        with self._candado:
+            umbrales = self._consultar("umbral(N, V)")
+            condiciones = self._consultar("condicion_especial(C)")
+            periodo = self._consultar("periodo_vigente(P)")
+        return {
+            "periodo": atomos(periodo, "P")[0],
+            "umbrales": {a_texto(f["N"]): f["V"] for f in umbrales},
+            "condiciones_especiales": atomos(condiciones, "C"),
+        }

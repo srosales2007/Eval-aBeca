@@ -35,3 +35,18 @@ def test_historial_y_consulta_por_id():
     assert any(s["id"] == creada["id"] for s in cliente.get("/api/solicitudes").json())
     assert cliente.get(f"/api/solicitudes/{creada['id']}").status_code == 200
     assert cliente.get("/api/solicitudes/NO-EXISTE").status_code == 404
+
+
+def test_filtros_del_historial():
+    cliente.post("/api/solicitudes", json={**VALIDA, "promedio": 60})
+    rechazadas = cliente.get("/api/solicitudes", params={"resultado": "rechazada"}).json()
+    assert rechazadas and all(s["dictamen"]["resultado"] == "rechazada" for s in rechazadas)
+    assert cliente.get("/api/solicitudes", params={"resultado": "otra"}).status_code == 422
+
+
+def test_estadisticas_y_criterios():
+    e = cliente.get("/api/estadisticas").json()
+    assert e["total"] == e["aprobadas"] + e["rechazadas"]
+    c = cliente.get("/api/criterios").json()
+    assert c["umbrales"]["promedio_minimo"] == 80
+    assert "discapacidad" in c["condiciones_especiales"]

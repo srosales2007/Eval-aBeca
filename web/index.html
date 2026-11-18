@@ -10,51 +10,107 @@
   <header class="barra">
     <h1>EvalúaBeca</h1>
     <span class="subtitulo">Motor híbrido de evaluación de solicitudes de beca</span>
+    <nav class="pestanas" id="pestanas">
+      <button class="activa" data-pestana="evaluar">Evaluar</button>
+      <button data-pestana="historial">Historial</button>
+      <button data-pestana="estadisticas">Estadísticas</button>
+      <button data-pestana="criterios">Criterios</button>
+    </nav>
   </header>
 
-  <main class="contenedor">
-    <section class="tarjeta">
-      <h2>Nueva solicitud</h2>
-      <form id="form-solicitud" novalidate>
-        <div class="fila">
-          <label>Carné <input name="carne" required pattern="[A-Za-z0-9-]{4,15}" placeholder="FI-2026-0145"></label>
-          <label>Nombre completo <input name="nombre" required minlength="3" placeholder="Ana Mora Solís"></label>
-        </div>
-        <label>Carrera <input name="carrera" required minlength="3" placeholder="Desarrollo de Software"></label>
-        <div class="fila">
-          <label>Promedio (0-100) <input name="promedio" type="number" step="0.01" min="0" max="100" required></label>
-          <label>Materias matriculadas <input name="materias" type="number" min="1" max="8" required></label>
-        </div>
-        <div class="fila">
-          <label>Ingreso mensual del hogar (₡) <input name="ingreso_hogar" type="number" min="0" required></label>
-          <label>Miembros del hogar <input name="miembros_hogar" type="number" min="1" max="20" required></label>
-        </div>
-        <p class="ayuda" id="ingreso-pc">Ingreso per cápita: —</p>
-        <fieldset>
-          <legend>Condiciones especiales</legend>
-          <label class="check"><input type="checkbox" name="condiciones" value="discapacidad"> Discapacidad</label>
-          <label class="check"><input type="checkbox" name="condiciones" value="jefe_de_hogar"> Jefe(a) de hogar</label>
-          <label class="check"><input type="checkbox" name="condiciones" value="zona_vulnerable"> Zona vulnerable</label>
-          <label class="check"><input type="checkbox" name="condiciones" value="primera_generacion"> Primera generación universitaria</label>
-        </fieldset>
-        <button type="submit" id="btn-evaluar">Evaluar solicitud</button>
-        <p class="error" id="error-form" hidden></p>
-      </form>
+  <main>
+    <!-- ===== Evaluar ===== -->
+    <section class="vista contenedor" id="vista-evaluar">
+      <div class="tarjeta">
+        <h2>Nueva solicitud</h2>
+        <form id="form-solicitud" novalidate>
+          <div class="fila">
+            <label>Carné <input name="carne" required pattern="[A-Za-z0-9-]{4,15}" placeholder="FI-2026-0145"></label>
+            <label>Nombre completo <input name="nombre" required minlength="3" placeholder="Ana Mora Solís"></label>
+          </div>
+          <label>Carrera <input name="carrera" required minlength="3" placeholder="Desarrollo de Software"></label>
+          <div class="fila">
+            <label>Promedio (0-100) <input name="promedio" type="number" step="0.01" min="0" max="100" required></label>
+            <label>Materias matriculadas <input name="materias" type="number" min="1" max="8" required></label>
+          </div>
+          <div class="fila">
+            <label>Ingreso mensual del hogar (₡) <input name="ingreso_hogar" type="number" min="0" required></label>
+            <label>Miembros del hogar <input name="miembros_hogar" type="number" min="1" max="20" required></label>
+          </div>
+          <p class="ayuda" id="ingreso-pc">Ingreso per cápita: —</p>
+          <fieldset>
+            <legend>Condiciones especiales</legend>
+            <label class="check"><input type="checkbox" name="condiciones" value="discapacidad"> Discapacidad</label>
+            <label class="check"><input type="checkbox" name="condiciones" value="jefe_de_hogar"> Jefe(a) de hogar</label>
+            <label class="check"><input type="checkbox" name="condiciones" value="zona_vulnerable"> Zona vulnerable</label>
+            <label class="check"><input type="checkbox" name="condiciones" value="primera_generacion"> Primera generación universitaria</label>
+          </fieldset>
+          <div class="acciones">
+            <button type="submit" id="btn-evaluar">Evaluar solicitud</button>
+            <button type="reset" class="secundario">Limpiar</button>
+          </div>
+          <p class="error" id="error-form" hidden></p>
+        </form>
+      </div>
+
+      <div class="tarjeta" id="panel-resultado">
+        <h2>Dictamen</h2>
+        <div id="resultado"><p class="vacio">Complete el formulario y presione «Evaluar solicitud». El dictamen y sus motivos aparecerán aquí.</p></div>
+      </div>
     </section>
 
-    <section class="tarjeta" id="panel-resultado" hidden>
-      <h2>Dictamen</h2>
-      <div id="resultado"></div>
+    <!-- ===== Historial ===== -->
+    <section class="vista contenedor-una" id="vista-historial" hidden>
+      <div class="tarjeta">
+        <h2>Historial de solicitudes</h2>
+        <div class="filtros">
+          <input type="search" id="filtro-texto" placeholder="Buscar por ID, nombre o carné">
+          <select id="filtro-resultado">
+            <option value="">Todos los dictámenes</option>
+            <option value="aprobada">Aprobadas</option>
+            <option value="rechazada">Rechazadas</option>
+          </select>
+          <select id="filtro-tipo">
+            <option value="">Todos los tipos de beca</option>
+            <option value="total">Beca total</option>
+            <option value="parcial">Beca parcial</option>
+            <option value="ninguna">Sin beca</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Estudiante</th><th>Carrera</th><th>Promedio</th><th>Dictamen</th><th>Beca</th><th>Fecha</th></tr></thead>
+          <tbody id="tabla-historial"></tbody>
+        </table>
+        <p class="ayuda">Haga clic en una fila para ver el detalle del dictamen.</p>
+      </div>
     </section>
 
-    <section class="tarjeta ancho">
-      <h2>Historial de solicitudes</h2>
-      <table>
-        <thead><tr><th>ID</th><th>Estudiante</th><th>Promedio</th><th>Dictamen</th><th>Beca</th><th>Fecha</th></tr></thead>
-        <tbody id="tabla-historial"><tr><td colspan="6" class="vacio">Sin solicitudes todavía</td></tr></tbody>
-      </table>
+    <!-- ===== Estadísticas ===== -->
+    <section class="vista contenedor-una" id="vista-estadisticas" hidden>
+      <div class="indicadores" id="indicadores"></div>
+      <div class="contenedor sin-margen">
+        <div class="tarjeta"><h2>Criterios más incumplidos</h2><div id="graf-incumplidos"></div></div>
+        <div class="tarjeta"><h2>Solicitudes por carrera</h2><div id="graf-carreras"></div></div>
+      </div>
+    </section>
+
+    <!-- ===== Criterios ===== -->
+    <section class="vista contenedor-una" id="vista-criterios" hidden>
+      <div class="tarjeta">
+        <h2>Criterios vigentes</h2>
+        <p class="ayuda">Estos valores se leen en tiempo real de <code>prolog/criterios.pl</code>. Para cambiar el reglamento se editan los hechos de ese archivo sin modificar el código Python.</p>
+        <div id="tabla-criterios"></div>
+      </div>
     </section>
   </main>
+
+  <!-- ===== Detalle (modal) ===== -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-caja" role="dialog" aria-modal="true">
+      <button class="cerrar" id="cerrar-modal" aria-label="Cerrar">×</button>
+      <div id="modal-contenido"></div>
+    </div>
+  </div>
 
   <script src="/static/app.js"></script>
 </body>
